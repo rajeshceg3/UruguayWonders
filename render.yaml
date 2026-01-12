@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: uruguay-wonders
+    runtime: static
+    buildCommand: npm run build
+    staticPublishPath: dist
+    autoDeployTrigger: off

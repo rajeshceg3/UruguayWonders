@@ -35,11 +35,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
     const attractionList = document.getElementById('attraction-list');
     const sidebarToggle = document.getElementById('sidebar-toggle');
+    const preloader = document.getElementById('preloader');
+
+    // Preloader Logic
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            preloader.classList.add('fade-out');
+            setTimeout(() => {
+                preloader.style.display = 'none';
+                // Trigger list animations after preloader is gone
+                animateListItems();
+            }, 500);
+        }, 800);
+    });
 
     const map = L.map('map', {
-        zoomControl: false // We'll add it in a different position
+        zoomControl: false
     }).setView([-32.5228, -55.7658], 7);
 
+    // Using a light, clean map style to match the pastel theme
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
@@ -57,8 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const customIcon = L.divIcon({
             className: 'custom-marker',
             html: '',
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
         });
 
         const marker = L.marker(attraction.coords, { icon: customIcon }).addTo(map);
@@ -73,6 +87,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const listItem = document.createElement('li');
         listItem.textContent = attraction.name;
         listItem.dataset.index = index;
+        // Animation is handled via class and delay
+        listItem.style.opacity = '0'; // Ensure hidden
+
         attractionList.appendChild(listItem);
 
         // Store references
@@ -82,27 +99,47 @@ document.addEventListener('DOMContentLoaded', () => {
         listItem.addEventListener('click', () => {
             map.flyTo(attraction.coords, 13, {
                 animate: true,
-                duration: 1.5
+                duration: 2.0, // Slower, more serene flight
+                easeLinearity: 0.25
             });
             setTimeout(() => {
                 marker.openPopup();
-            }, 1000); // Open popup after flying
+            }, 2000);
             setActive(index);
         });
 
         marker.on('click', () => {
             setActive(index);
+            map.flyTo(attraction.coords, 13, {
+                animate: true,
+                duration: 2.0
+            });
         });
     });
 
+    function animateListItems() {
+        const items = document.querySelectorAll('#attraction-list li');
+        items.forEach((item, index) => {
+            item.style.animation = `slideIn 0.5s ease forwards`;
+            item.style.animationDelay = `${index * 0.1}s`;
+        });
+    }
+
     function setActive(index) {
         markers.forEach((item, i) => {
+            const markerEl = item.marker.getElement();
             if (i === index) {
                 item.listItem.classList.add('active');
-                item.marker.getElement().classList.add('active');
+                markerEl.classList.add('active');
+
+                // Add bounce animation
+                markerEl.classList.remove('bounce');
+                void markerEl.offsetWidth; // Trigger reflow
+                markerEl.classList.add('bounce');
             } else {
                 item.listItem.classList.remove('active');
-                item.marker.getElement().classList.remove('active');
+                markerEl.classList.remove('active');
+                markerEl.classList.remove('bounce');
             }
         });
     }
@@ -111,27 +148,17 @@ document.addEventListener('DOMContentLoaded', () => {
         e.stopPropagation();
         sidebar.classList.toggle('show');
         sidebarToggle.classList.toggle('active');
-        // Adjust toggle button position when sidebar is open for mobile
-        if (window.innerWidth <= 768) {
-            if (sidebar.classList.contains('show')) {
-                sidebarToggle.style.left = `calc(100% - 55px)`;
-            } else {
-                sidebarToggle.style.left = '15px';
-            }
-        }
     });
 
     map.on('click', () => {
-        if (sidebar.classList.contains('show')) {
+        if (window.innerWidth <= 768 && sidebar.classList.contains('show')) {
             sidebar.classList.remove('show');
             sidebarToggle.classList.remove('active');
-            if (window.innerWidth <= 768) {
-                sidebarToggle.style.left = '15px';
-            }
         }
-        markers.forEach(item => {
-            item.listItem.classList.remove('active');
-            item.marker.getElement().classList.remove('active');
-        });
+        // Optional: Deselect items when clicking map
+        // markers.forEach(item => {
+        //     item.listItem.classList.remove('active');
+        //     item.marker.getElement().classList.remove('active');
+        // });
     });
 });

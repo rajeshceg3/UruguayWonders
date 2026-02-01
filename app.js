@@ -108,6 +108,16 @@ document.addEventListener('DOMContentLoaded', () => {
             setActive(index);
         });
 
+        listItem.addEventListener('mouseenter', () => {
+            const markerEl = marker.getElement();
+            if (markerEl) markerEl.classList.add('hover-active');
+        });
+
+        listItem.addEventListener('mouseleave', () => {
+             const markerEl = marker.getElement();
+             if (markerEl) markerEl.classList.remove('hover-active');
+        });
+
         marker.on('click', () => {
             setActive(index);
             map.flyTo(attraction.coords, 13, {

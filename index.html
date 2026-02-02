@@ -15,9 +15,16 @@
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
     <div id="preloader">
-        <div class="intro-text">
-            <span>Explore</span>
-            Serene Uruguay
+        <div class="loader-content">
+            <div class="pulse-wrapper">
+                <div class="pulse-ring"></div>
+                <div class="pulse-ring"></div>
+                <div class="pulse-core"></div>
+            </div>
+            <div class="intro-text">
+                <span>Discover</span>
+                Uruguay Wonders
+            </div>
         </div>
     </div>
     <div id="app">
@@ -42,6 +49,22 @@
         <button id="sidebar-toggle" aria-label="Toggle Sidebar">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
+
+        <!-- Detail Panel -->
+        <div id="detail-panel">
+            <button class="close-btn" aria-label="Close Details">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <div class="detail-content">
+                <div class="detail-image-container">
+                    <img id="detail-image" src="" alt="">
+                </div>
+                <div class="detail-info">
+                    <h2 id="detail-title"></h2>
+                    <p id="detail-desc"></p>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script type="module" src="/app.js"></script>

@@ -3,32 +3,44 @@ document.addEventListener('DOMContentLoaded', () => {
         {
             name: 'Cabo Polonio',
             coords: [-34.408, -53.784],
-            description: 'A remote and rustic village known for its sand dunes, sea lion colony, and lack of electricity, offering a unique off-the-grid experience.'
+            image: 'https://loremflickr.com/800/600/dunes,beach',
+            description: 'A remote and rustic village known for its sand dunes, sea lion colony, and lack of electricity.',
+            details: 'Step into a world where time stands still. Cabo Polonio is a protected area with no electricity or running water, accessible only by 4x4 trucks or a long hike. Famous for its shifting sand dunes, one of the largest sea lion colonies in South America, and a lighthouse that guides sailors through the treacherous waters. At night, the lack of light pollution offers one of the most spectacular starry skies you will ever witness.'
         },
         {
             name: 'Punta del Diablo',
             coords: [-34.047, -53.545],
-            description: 'A picturesque fishing village with colorful houses, beautiful beaches, and a bohemian atmosphere, popular with surfers and artists.'
+            image: 'https://loremflickr.com/800/600/fishing,village',
+            description: 'A picturesque fishing village with colorful houses, beautiful beaches, and a bohemian atmosphere.',
+            details: 'Originally a small fishing village, Punta del Diablo has evolved into a vibrant summer destination while keeping its rustic charm. Colorful wooden cabins dot the rocky coastline, and fishing boats still launch from the beach every morning. It is a paradise for surfers, artisans, and those seeking a laid-back vibe with stunning ocean views and fresh seafood.'
         },
         {
             name: 'Santa Teresa National Park',
             coords: [-33.974, -53.55],
-            description: 'A vast coastal park featuring a historic fortress, pristine beaches, extensive forests, and well-maintained camping facilities.'
+            image: 'https://loremflickr.com/800/600/forest,fort',
+            description: 'A vast coastal park featuring a historic fortress, pristine beaches, and extensive forests.',
+            details: 'Immerse yourself in history and nature. This 3,000-hectare park houses the impressive Fortaleza de Santa Teresa, a Portuguese fort built in 1762. Beyond the stone walls lies a massive reserve of native and exotic flora, camping grounds, and four pristine beaches—La Moza, Las Achiras, Playa del Barco, and Playa Grande—perfect for surfing and solitude.'
         },
         {
             name: 'Quebrada de los Cuervos',
             coords: [-32.94, -54.44],
-            description: 'A stunning subtropical canyon and protected landscape, offering hiking trails through lush vegetation and unique geological formations.'
+            image: 'https://loremflickr.com/800/600/canyon,valley',
+            description: 'A stunning subtropical canyon offering hiking trails through lush vegetation.',
+            details: 'A hidden gem in the Treinta y Tres department, the "Gorge of the Crows" is a deep canyon carved by the Yerbal Chico stream. It is a protected landscape with a unique microclimate that supports abundant subtropical flora and fauna. Hiking trails take you to panoramic viewpoints and down to the river, offering an adventurous escape into the wild heart of Uruguay.'
         },
         {
             name: 'Esteros de Farrapos',
             coords: [-33.15, -58.1],
-            description: 'A national park and wetlands of international importance, home to a rich diversity of birdlife and aquatic ecosystems.'
+            image: 'https://loremflickr.com/800/600/wetlands,river',
+            description: 'A national park and wetlands of international importance, home to rich birdlife.',
+            details: 'Part of a National Park along the Uruguay River, these wetlands are a Ramsar site of international importance. It is a mosaic of islands, swamps, and river channels that serve as a sanctuary for biodiversity. Visitors can explore by boat to see carpinchos (capybaras), river otters, and over 200 bird species, including the elegant black-necked swan.'
         },
         {
             name: 'Laguna de Rocha',
             coords: [-34.61, -54.29],
-            description: 'A coastal lagoon separated from the Atlantic by a sandbar, designated as a biosphere reserve and a haven for migratory birds.'
+            image: 'https://loremflickr.com/800/600/lagoon,sunset',
+            description: 'A coastal lagoon separated from the Atlantic by a sandbar, a haven for migratory birds.',
+            details: 'A breathtaking protected landscape where the fresh water of the lagoon meets the salt water of the ocean, separated only by a narrow sandbar. This dynamic ecosystem is a birdwatcher’s paradise, hosting thousands of flamingos, swans, and migratory birds. The lagoon is also home to traditional shrimp fishermen who work by lantern light, creating a magical scene at dusk.'
         }
     ];
 
@@ -36,6 +48,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const attractionList = document.getElementById('attraction-list');
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const preloader = document.getElementById('preloader');
+
+    // Detail Panel Elements
+    const detailPanel = document.getElementById('detail-panel');
+    const detailImage = document.getElementById('detail-image');
+    const detailTitle = document.getElementById('detail-title');
+    const detailDesc = document.getElementById('detail-desc');
+    const closeBtn = detailPanel.querySelector('.close-btn');
+
+    function openDetailPanel(attraction) {
+        detailImage.src = attraction.image;
+        detailTitle.textContent = attraction.name;
+        detailDesc.textContent = attraction.details || attraction.description;
+
+        detailPanel.classList.add('active');
+
+        // Mobile UX: Close sidebar if open
+        if (window.innerWidth <= 768) {
+            sidebar.classList.remove('show');
+            sidebarToggle.classList.remove('active');
+        }
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            detailPanel.classList.remove('active');
+        });
+    }
 
     // Custom Cursor Logic
     const cursorDot = document.querySelector('.cursor-dot');
@@ -159,15 +198,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const marker = L.marker(attraction.coords, { icon: customIcon }).addTo(map);
 
-        const popupContent = `
-            <h3>${attraction.name}</h3>
-            <p>${attraction.description}</p>
-        `;
-        marker.bindPopup(popupContent);
-
         // Create sidebar item
         const listItem = document.createElement('li');
-        listItem.textContent = attraction.name;
+
+        const thumb = document.createElement('img');
+        thumb.src = attraction.image;
+        thumb.alt = attraction.name;
+        thumb.className = 'list-thumb';
+
+        const textSpan = document.createElement('span');
+        textSpan.textContent = attraction.name;
+
+        listItem.appendChild(thumb);
+        listItem.appendChild(textSpan);
+
         listItem.dataset.index = index;
         // Animation is handled via class and delay
         listItem.style.opacity = '0'; // Ensure hidden
@@ -187,9 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 duration: 2.5, // Slower, more serene flight
                 easeLinearity: 0.25
             });
-            setTimeout(() => {
-                marker.openPopup();
-            }, 2500);
+            openDetailPanel(attraction);
             setActive(index);
         });
 
@@ -209,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 animate: true,
                 duration: 2.0
             });
+            openDetailPanel(attraction);
         });
     });
 

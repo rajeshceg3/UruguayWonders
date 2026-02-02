@@ -37,16 +37,89 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const preloader = document.getElementById('preloader');
 
+    // Custom Cursor Logic
+    const cursorDot = document.querySelector('.cursor-dot');
+    const cursorOutline = document.querySelector('.cursor-outline');
+
+    // Check if device has coarse pointer (touch) to avoid logic errors or weird visuals
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+
+    if (!isTouch && cursorDot && cursorOutline) {
+        let cursorX = 0, cursorY = 0;
+        let outlineX = 0, outlineY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            cursorX = e.clientX;
+            cursorY = e.clientY;
+
+            // Dot follows immediately
+            cursorDot.style.left = `${cursorX}px`;
+            cursorDot.style.top = `${cursorY}px`;
+        });
+
+        // Loop for outline - uses requestAnimationFrame for performance
+        function animateCursor() {
+            // Smooth interpolation
+            outlineX += (cursorX - outlineX) * 0.15;
+            outlineY += (cursorY - outlineY) * 0.15;
+
+            cursorOutline.style.left = `${outlineX}px`;
+            cursorOutline.style.top = `${outlineY}px`;
+
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Hover effects via delegation
+        document.body.addEventListener('mouseover', (e) => {
+            const target = e.target.closest('a, button, li, .leaflet-interactive, .map-control-btn');
+            if (target) {
+                cursorOutline.classList.add('cursor-hover');
+                cursorDot.classList.add('cursor-hover');
+            }
+        });
+
+        document.body.addEventListener('mouseout', (e) => {
+            const target = e.target.closest('a, button, li, .leaflet-interactive, .map-control-btn');
+            if (target) {
+                cursorOutline.classList.remove('cursor-hover');
+                cursorDot.classList.remove('cursor-hover');
+            }
+        });
+    }
+
     // Preloader Logic
     window.addEventListener('load', () => {
+        const introText = preloader.querySelector('.intro-text');
+
+        // Step 1: Reveal Text
         setTimeout(() => {
-            preloader.classList.add('fade-out');
+            if (introText) {
+                introText.style.opacity = '1';
+                introText.style.transform = 'translateY(0)';
+            }
+
+            // Step 2: Fade Out Preloader
             setTimeout(() => {
-                preloader.style.display = 'none';
-                // Trigger list animations after preloader is gone
-                animateListItems();
-            }, 500);
-        }, 800);
+                preloader.classList.add('fade-out');
+
+                // Step 3: Remove from DOM & Animate List
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                    animateListItems();
+
+                    // Trigger sidebar entrance
+                    setTimeout(() => {
+                        sidebar.classList.add('show');
+                        // Also show zoom controls if on desktop
+                        if (window.innerWidth > 768) {
+                            const controls = document.querySelector('.custom-map-controls');
+                            if(controls) controls.style.opacity = '1';
+                        }
+                    }, 200);
+                }, 800); // Match CSS transition time
+            }, 2000); // Time to read the text
+        }, 500);
     });
 
     const map = L.map('map', {
@@ -60,19 +133,28 @@ document.addEventListener('DOMContentLoaded', () => {
         maxZoom: 19
     }).addTo(map);
 
-    L.control.zoom({
-        position: 'bottomright'
-    }).addTo(map);
+    // Custom Zoom Controls
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomOutBtn = document.getElementById('zoom-out');
+
+    if (zoomInBtn && zoomOutBtn) {
+        zoomInBtn.addEventListener('click', () => map.zoomIn());
+        zoomOutBtn.addEventListener('click', () => map.zoomOut());
+
+        // Add Magnetic Effect to zoom controls too
+        magneticEffect(zoomInBtn);
+        magneticEffect(zoomOutBtn);
+    }
 
     const markers = [];
 
     attractions.forEach((attraction, index) => {
         // Create marker
         const customIcon = L.divIcon({
-            className: 'custom-marker',
+            className: 'marker-beacon',
             html: '',
-            iconSize: [24, 24],
-            iconAnchor: [12, 12]
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
         });
 
         const marker = L.marker(attraction.coords, { icon: customIcon }).addTo(map);
@@ -95,16 +177,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Store references
         markers.push({ marker, listItem });
 
+        // Apply Tilt Effect
+        tiltEffect(listItem);
+
         // Event listeners
         listItem.addEventListener('click', () => {
             map.flyTo(attraction.coords, 13, {
                 animate: true,
-                duration: 2.0, // Slower, more serene flight
+                duration: 2.5, // Slower, more serene flight
                 easeLinearity: 0.25
             });
             setTimeout(() => {
                 marker.openPopup();
-            }, 2000);
+            }, 2500);
             setActive(index);
         });
 
@@ -165,10 +250,71 @@ document.addEventListener('DOMContentLoaded', () => {
             sidebar.classList.remove('show');
             sidebarToggle.classList.remove('active');
         }
-        // Optional: Deselect items when clicking map
-        // markers.forEach(item => {
-        //     item.listItem.classList.remove('active');
-        //     item.marker.getElement().classList.remove('active');
-        // });
     });
+
+    // Apply Magnetic Effect to Sidebar Toggle
+    magneticEffect(sidebarToggle);
+
+    /* --- Visual Effect Helpers --- */
+
+    function magneticEffect(element) {
+        if (!element) return;
+
+        let rect;
+
+        // Cache rect on mouse enter to prevent layout thrashing
+        element.addEventListener('mouseenter', () => {
+            rect = element.getBoundingClientRect();
+            element.style.transition = 'transform 0.1s ease-out';
+        });
+
+        element.addEventListener('mousemove', (e) => {
+            if (!rect) rect = element.getBoundingClientRect(); // Fallback safety
+
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+
+            // Magnetic pull
+            element.style.transform = `translate(${x * 0.4}px, ${y * 0.4}px) scale(1.1)`;
+        });
+
+        element.addEventListener('mouseleave', () => {
+            element.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            element.style.transform = '';
+            rect = null; // Clear cache
+        });
+    }
+
+    function tiltEffect(element) {
+        if (!element) return;
+
+        let rect;
+
+        element.addEventListener('mouseenter', () => {
+            rect = element.getBoundingClientRect();
+            // Remove transition for instant follow
+            element.style.transition = 'none';
+        });
+
+        element.addEventListener('mousemove', (e) => {
+            if (!rect) rect = element.getBoundingClientRect();
+
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = ((y - centerY) / centerY) * -8; // Max deg
+            const rotateY = ((x - centerX) / centerX) * 8;
+
+            element.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+        });
+
+        element.addEventListener('mouseleave', () => {
+            element.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            element.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+            rect = null;
+        });
+    }
 });

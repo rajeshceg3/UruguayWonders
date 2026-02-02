@@ -12,8 +12,13 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
     <div id="preloader">
-        <div class="spinner"></div>
+        <div class="intro-text">
+            <span>Explore</span>
+            Serene Uruguay
+        </div>
     </div>
     <div id="app">
         <div id="sidebar">
@@ -23,6 +28,17 @@
             <ul id="attraction-list"></ul>
         </div>
         <div id="map"></div>
+
+        <!-- Custom Map Controls -->
+        <div class="custom-map-controls">
+            <button class="map-control-btn" id="zoom-in" aria-label="Zoom In">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            <button class="map-control-btn" id="zoom-out" aria-label="Zoom Out">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+        </div>
+
         <button id="sidebar-toggle" aria-label="Toggle Sidebar">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>

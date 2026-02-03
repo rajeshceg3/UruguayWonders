@@ -1,31 +1,31 @@
 :root {
     /* Refined Pastel Palette */
-    /* Deep Sage - A calming, grounded green */
-    --primary-color: #92C7B0;
-    --primary-dark: #76A994;
+    /* Deep Sage - A calming, grounded green, slightly warmer */
+    --primary-color: #88B7A4;
+    --primary-dark: #6D9A88;
 
     /* Dusty Lavender - Soft and dreamy */
-    --secondary-color: #C1AADB;
+    --secondary-color: #B5A0D2;
     --secondary-light: #E0D1F0;
 
-    /* Carnation Pink - Warm accent */
-    --accent-color: #FFC2D6;
+    /* Carnation Pink - Warm accent, slightly desaturated */
+    --accent-color: #F2B5C6;
     --accent-hover: #FFD6E4;
 
     /* Backgrounds */
-    --bg-color: #F0F4F5; /* Slightly warmer cool white */
+    --bg-color: #F7F7F5; /* Warmer, creamier off-white */
     --white: #FFFFFF;
 
     /* Typography Colors */
-    --text-color: #2D3A45;      /* Softer than pure black */
+    --text-color: #2C333A;      /* Deep charcoal */
     --text-light: #607080;      /* Muted secondary text */
 
     /* Advanced Glassmorphism */
-    --glass-bg: rgba(255, 255, 255, 0.65);
-    --glass-bg-hover: rgba(255, 255, 255, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.5);
-    --glass-shadow: 0 8px 32px 0 rgba(100, 110, 120, 0.1);
-    --glass-blur: blur(20px) saturate(160%);
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-bg-hover: rgba(255, 255, 255, 0.90);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.1);
+    --glass-blur: blur(20px) saturate(180%);
 
     /* Transitions */
     --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -48,6 +48,8 @@ body {
     overflow: hidden;
     background-color: var(--bg-color);
     color: var(--text-color);
+    line-height: 1.7; /* Improved readability */
+    letter-spacing: 0.01em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -62,7 +64,8 @@ body::before {
     height: 100%;
     pointer-events: none;
     z-index: 9998;
-    opacity: 0.04;
+    opacity: 0.05; /* Slightly increased visibility */
+    mix-blend-mode: overlay; /* Better blending */
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
@@ -143,8 +146,8 @@ body::before {
         border-width: 2px;
     }
     100% {
-        width: 100px;
-        height: 100px;
+        width: 140px;
+        height: 140px;
         opacity: 0;
         border-width: 0px;
     }
@@ -157,8 +160,8 @@ body::before {
     color: var(--text-color);
     text-align: center;
     opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.8s var(--ease-elastic);
+    transform: translateY(20px) scale(0.95);
+    transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .intro-text span {
@@ -244,6 +247,7 @@ body::before {
 }
 
 #attraction-list li {
+    position: relative; /* For spotlight positioning */
     padding: 15px;
     margin-bottom: 18px;
     cursor: pointer;
@@ -263,6 +267,35 @@ body::before {
     display: flex;
     align-items: center;
     gap: 15px;
+    overflow: hidden; /* Contain spotlight */
+}
+
+/* Spotlight Effect */
+#attraction-list li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        600px circle at var(--x, 50%) var(--y, 50%),
+        rgba(255, 255, 255, 0.6),
+        transparent 40%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+#attraction-list li:hover::before {
+    opacity: 1;
+}
+
+#attraction-list li > * {
+    position: relative;
+    z-index: 2;
 }
 
 .list-thumb {
@@ -372,13 +405,13 @@ body::before {
 /* Custom Marker - Beacons */
 .marker-beacon {
     position: relative;
-    width: 20px;
-    height: 20px;
-    background: var(--accent-color);
+    width: 24px;
+    height: 24px;
+    background: radial-gradient(circle at 30% 30%, var(--accent-color), var(--secondary-color));
     border-radius: 50%;
     border: 2px solid var(--white);
-    box-shadow: 0 0 0 rgba(255, 194, 214, 0.4);
-    transition: all 0.3s var(--ease-elastic);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    transition: all 0.5s var(--ease-elastic);
 }
 
 .marker-beacon::before,
@@ -391,38 +424,41 @@ body::before {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    border: 1px solid var(--accent-color);
-    animation: ripple 2s infinite linear;
+    border: 2px solid var(--accent-color);
+    animation: ripple 2.5s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity: 0;
 }
 
 .marker-beacon::after {
-    animation-delay: 1s;
+    animation-delay: 1.25s;
 }
 
 @keyframes ripple {
-    0% { width: 100%; height: 100%; opacity: 1; border-width: 1px; }
-    100% { width: 300%; height: 300%; opacity: 0; border-width: 0px; }
+    0% { width: 100%; height: 100%; opacity: 0.8; border-width: 2px; }
+    100% { width: 350%; height: 350%; opacity: 0; border-width: 0px; }
 }
 
 .marker-beacon.active,
 .marker-beacon:hover {
-    background: var(--secondary-color);
-    transform: scale(1.5);
+    background: radial-gradient(circle at 30% 30%, var(--primary-color), var(--primary-dark));
+    transform: scale(1.4);
     z-index: 1000;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    border-color: rgba(255,255,255,0.9);
 }
 
 /* Popup Styling - Floating Glass */
 .leaflet-popup-content-wrapper {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(12px);
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px) saturate(180%);
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
     padding: 0;
-    border: 1px solid rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.6);
     overflow: hidden;
 }
 
-.leaflet-popup-tip {
+.leaflet-popup-tip-container, .leaflet-popup-tip {
     display: none; /* Remove tip for cleaner look */
 }
 
@@ -474,30 +510,31 @@ body::before {
     z-index: 1000;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 16px;
 }
 
 .map-control-btn {
-    width: 50px;
-    height: 50px;
+    width: 56px;
+    height: 56px;
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
-    border-radius: 16px;
+    border-radius: 50%; /* Perfect circle */
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: none; /* Custom cursor */
-    box-shadow: var(--glass-shadow);
-    transition: all 0.3s var(--ease-elastic);
+    cursor: none;
+    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.1);
+    transition: all 0.4s var(--ease-elastic);
     color: var(--text-color);
 }
 
 .map-control-btn:hover {
     background: var(--white);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
     color: var(--primary-color);
+    border-color: var(--white);
 }
 
 /* Detail Panel */
@@ -511,7 +548,7 @@ body::before {
     backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
     border-radius: 32px;
-    box-shadow: var(--glass-shadow);
+    box-shadow: -10px 0 40px rgba(0,0,0,0.1), var(--glass-shadow);
     z-index: 1002;
     transform: translateX(120%);
     transition: transform 0.8s var(--ease-bounce);
@@ -531,33 +568,38 @@ body::before {
 
 .detail-image-container {
     width: 100%;
-    height: 250px;
+    height: 300px; /* Taller for better impact */
     overflow: hidden;
     position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    z-index: 1;
 }
 
 #detail-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.8s ease;
+    transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
 }
 
-#detail-panel:hover #detail-image {
-    transform: scale(1.05);
-}
+/* Hover handled by JS for parallax now, but keep default scale just in case */
+/* #detail-panel:hover #detail-image { transform: scale(1.05); } */
 
 .detail-info {
-    padding: 30px;
+    padding: 35px;
 }
 
 #detail-title {
     font-family: var(--font-heading);
     color: var(--text-color);
-    font-size: 28px;
+    font-size: 32px;
     margin-top: 0;
     margin-bottom: 16px;
-    line-height: 1.2;
+    line-height: 1.1;
+    background: linear-gradient(135deg, var(--text-color) 0%, var(--primary-dark) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 #detail-desc {

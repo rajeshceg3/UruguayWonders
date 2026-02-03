@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             if (introText) {
                 introText.style.opacity = '1';
-                introText.style.transform = 'translateY(0)';
+                introText.style.transform = 'translateY(0) scale(1)';
             }
 
             // Step 2: Fade Out Preloader
@@ -224,6 +224,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Apply Tilt Effect
         tiltEffect(listItem);
 
+        // Spotlight Effect
+        listItem.addEventListener('mousemove', (e) => {
+            const rect = listItem.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            listItem.style.setProperty('--x', `${x}px`);
+            listItem.style.setProperty('--y', `${y}px`);
+        });
+
         // Event listeners
         listItem.addEventListener('click', () => {
             map.flyTo(attraction.coords, 13, {
@@ -258,8 +267,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function animateListItems() {
         const items = document.querySelectorAll('#attraction-list li');
         items.forEach((item, index) => {
-            item.style.animation = `slideIn 0.5s ease forwards`;
-            item.style.animationDelay = `${index * 0.1}s`;
+            item.style.animation = `slideIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards`;
+            item.style.animationDelay = `${index * 0.08}s`;
         });
     }
 
@@ -297,6 +306,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Apply Magnetic Effect to Sidebar Toggle
     magneticEffect(sidebarToggle);
+
+    // Detail Panel Parallax
+    if (detailPanel && detailImage) {
+        detailPanel.addEventListener('mousemove', (e) => {
+            const rect = detailPanel.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const xPercent = (x / rect.width - 0.5) * 2; // -1 to 1
+            const yPercent = (y / rect.height - 0.5) * 2;
+
+            detailImage.style.transition = 'transform 0.1s ease-out';
+            detailImage.style.transform = `scale(1.1) translate(${-xPercent * 15}px, ${-yPercent * 15}px)`;
+        });
+
+        detailPanel.addEventListener('mouseleave', () => {
+            detailImage.style.transition = 'transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            detailImage.style.transform = 'scale(1.0) translate(0, 0)';
+        });
+    }
 
     /* --- Visual Effect Helpers --- */
 

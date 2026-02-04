@@ -98,9 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Loop for outline - uses requestAnimationFrame for performance
         function animateCursor() {
-            // Smooth interpolation
-            outlineX += (cursorX - outlineX) * 0.15;
-            outlineY += (cursorY - outlineY) * 0.15;
+            // Luxuriously smooth interpolation
+            outlineX += (cursorX - outlineX) * 0.12;
+            outlineY += (cursorY - outlineY) * 0.12;
 
             cursorOutline.style.left = `${outlineX}px`;
             cursorOutline.style.top = `${outlineY}px`;
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Hover effects via delegation
         document.body.addEventListener('mouseover', (e) => {
-            const target = e.target.closest('a, button, li, .leaflet-interactive, .map-control-btn');
+            const target = e.target.closest('a, button, li, .leaflet-interactive, .map-control-btn, .close-btn');
             if (target) {
                 cursorOutline.classList.add('cursor-hover');
                 cursorDot.classList.add('cursor-hover');
@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.body.addEventListener('mouseout', (e) => {
-            const target = e.target.closest('a, button, li, .leaflet-interactive, .map-control-btn');
+            const target = e.target.closest('a, button, li, .leaflet-interactive, .map-control-btn, .close-btn');
             if (target) {
                 cursorOutline.classList.remove('cursor-hover');
                 cursorDot.classList.remove('cursor-hover');
@@ -127,9 +127,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Preloader Logic
+    // Cinematic Entrance Logic
     window.addEventListener('load', () => {
         const introText = preloader.querySelector('.intro-text');
+        const mapContainer = document.getElementById('map');
+        const controls = document.querySelector('.custom-map-controls');
+
+        // Initial State
+        if (mapContainer) mapContainer.style.opacity = '0';
+        if (controls) {
+            controls.style.opacity = '0';
+            controls.style.transform = 'translateY(20px)';
+            controls.style.transition = 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        }
 
         // Step 1: Reveal Text
         setTimeout(() => {
@@ -138,26 +148,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 introText.style.transform = 'translateY(0) scale(1)';
             }
 
-            // Step 2: Fade Out Preloader
+            // Step 2: Fade Out Preloader & Reveal Map
             setTimeout(() => {
                 preloader.classList.add('fade-out');
+                if (mapContainer) {
+                    mapContainer.style.transition = 'opacity 1.5s ease-in-out';
+                    mapContainer.style.opacity = '1';
+                }
 
-                // Step 3: Remove from DOM & Animate List
+                // Step 3: Remove Preloader & Animate UI
                 setTimeout(() => {
                     preloader.style.display = 'none';
-                    animateListItems();
 
-                    // Trigger sidebar entrance
+                    // Sidebar Entrance
                     setTimeout(() => {
                         sidebar.classList.add('show');
-                        // Also show zoom controls if on desktop
-                        if (window.innerWidth > 768) {
-                            const controls = document.querySelector('.custom-map-controls');
-                            if(controls) controls.style.opacity = '1';
+                        animateListItems();
+                    }, 100);
+
+                    // Controls Entrance (Staggered)
+                    setTimeout(() => {
+                        if (controls) {
+                            controls.style.opacity = '1';
+                            controls.style.transform = 'translateY(0)';
                         }
-                    }, 200);
-                }, 800); // Match CSS transition time
-            }, 2000); // Time to read the text
+                    }, 600);
+
+                }, 800);
+            }, 2200);
         }, 500);
     });
 
@@ -171,6 +189,29 @@ document.addEventListener('DOMContentLoaded', () => {
         subdomains: 'abcd',
         maxZoom: 19
     }).addTo(map);
+
+    // Inject Glass Tooltip Styles
+    const tooltipStyle = document.createElement('style');
+    tooltipStyle.textContent = `
+        .glass-tooltip {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid var(--glass-border) !important;
+            color: var(--text-color) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+            font-family: var(--font-heading) !important;
+            font-weight: 600 !important;
+            padding: 6px 14px !important;
+            font-size: 0.9rem !important;
+            opacity: 1 !important;
+        }
+        .glass-tooltip::before {
+            display: none; /* Remove default arrow for cleaner float look */
+        }
+    `;
+    document.head.appendChild(tooltipStyle);
 
     // Custom Zoom Controls
     const zoomInBtn = document.getElementById('zoom-in');
@@ -197,6 +238,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const marker = L.marker(attraction.coords, { icon: customIcon }).addTo(map);
+
+        // Add Glass Tooltip
+        marker.bindTooltip(attraction.name, {
+            permanent: false,
+            direction: 'top',
+            className: 'glass-tooltip',
+            offset: [0, -16],
+            opacity: 1
+        });
 
         // Create sidebar item
         const listItem = document.createElement('li');
@@ -329,31 +379,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* --- Visual Effect Helpers --- */
 
+    // Global Ripple Effect
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('button, .map-control-btn, #attraction-list li, .leaflet-popup-close-button');
+        if (target) {
+            createRipple(e, target);
+        }
+    });
+
+    function createRipple(event, element) {
+        const circle = document.createElement('span');
+        const diameter = Math.max(element.clientWidth, element.clientHeight);
+        const radius = diameter / 2;
+
+        const rect = element.getBoundingClientRect();
+
+        circle.style.width = circle.style.height = `${diameter}px`;
+        circle.style.left = `${event.clientX - rect.left - radius}px`;
+        circle.style.top = `${event.clientY - rect.top - radius}px`;
+        circle.classList.add('ripple');
+
+        // Ensure element has relative position and hidden overflow for containment
+        // We handle this non-destructively
+        const computedStyle = window.getComputedStyle(element);
+        if (computedStyle.position === 'static') {
+            element.style.position = 'relative';
+        }
+        if (computedStyle.overflow !== 'hidden') {
+            element.style.overflow = 'hidden';
+        }
+
+        const ripple = element.getElementsByClassName('ripple')[0];
+        if (ripple) {
+            ripple.remove();
+        }
+
+        element.appendChild(circle);
+
+        setTimeout(() => {
+            circle.remove();
+        }, 800); // Match animation duration
+    }
+
     function magneticEffect(element) {
         if (!element) return;
 
-        let rect;
+        let bounds;
 
-        // Cache rect on mouse enter to prevent layout thrashing
         element.addEventListener('mouseenter', () => {
-            rect = element.getBoundingClientRect();
-            element.style.transition = 'transform 0.1s ease-out';
+            bounds = element.getBoundingClientRect();
+            element.style.transition = 'transform 0.3s ease-out';
         });
 
         element.addEventListener('mousemove', (e) => {
-            if (!rect) rect = element.getBoundingClientRect(); // Fallback safety
+            if (!bounds) bounds = element.getBoundingClientRect();
 
-            const x = e.clientX - rect.left - rect.width / 2;
-            const y = e.clientY - rect.top - rect.height / 2;
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            const centerX = bounds.left + bounds.width / 2;
+            const centerY = bounds.top + bounds.height / 2;
 
-            // Magnetic pull
-            element.style.transform = `translate(${x * 0.4}px, ${y * 0.4}px) scale(1.1)`;
+            const deltaX = (mouseX - centerX) * 0.3; // Gentle pull
+            const deltaY = (mouseY - centerY) * 0.3;
+
+            element.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(1.05)`;
         });
 
         element.addEventListener('mouseleave', () => {
-            element.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
             element.style.transform = '';
-            rect = null; // Clear cache
+            element.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)'; // Elastic snap back
+            bounds = null;
         });
     }
 

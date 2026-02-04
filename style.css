@@ -1,38 +1,43 @@
 :root {
-    /* Refined Pastel Palette */
-    /* Deep Sage - A calming, grounded green, slightly warmer */
-    --primary-color: #88B7A4;
-    --primary-dark: #6D9A88;
+    /* Ethereal Nature Palette - Production Grade */
+    /* Soft Eucalyptus - Primary Action & Brand */
+    --primary-color: #7FA99B;
+    --primary-dark: #5C8D7D;
+    --primary-light: #A8D1C5;
 
-    /* Dusty Lavender - Soft and dreamy */
-    --secondary-color: #B5A0D2;
-    --secondary-light: #E0D1F0;
+    /* Muted Lavender - Secondary & Creative Elements */
+    --secondary-color: #9D8FB3;
+    --secondary-light: #C6BDD6;
 
-    /* Carnation Pink - Warm accent, slightly desaturated */
-    --accent-color: #F2B5C6;
-    --accent-hover: #FFD6E4;
+    /* Warm Sand/Peach - Accents & Highlights */
+    --accent-color: #F3D8C7;
+    --accent-hover: #FCECE3;
+    --accent-vibrant: #E8B49C;
 
-    /* Backgrounds */
-    --bg-color: #F7F7F5; /* Warmer, creamier off-white */
+    /* Backgrounds - Nuanced & Organic */
+    --bg-color: #F9F9F7;
     --white: #FFFFFF;
+    --surface-light: rgba(255, 255, 255, 0.85);
 
-    /* Typography Colors */
-    --text-color: #2C333A;      /* Deep charcoal */
-    --text-light: #607080;      /* Muted secondary text */
+    /* Typography Colors - High Contrast & Readability */
+    --text-color: #354F52;      /* Deep Slate for body */
+    --text-dark: #1B2D2F;       /* Almost black for headings */
+    --text-light: #6B8588;      /* Muted for meta info */
 
-    /* Advanced Glassmorphism */
-    --glass-bg: rgba(255, 255, 255, 0.75);
-    --glass-bg-hover: rgba(255, 255, 255, 0.90);
-    --glass-border: rgba(255, 255, 255, 0.6);
-    --glass-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.1);
-    --glass-blur: blur(20px) saturate(180%);
+    /* Advanced Glassmorphism 2.0 */
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-bg-hover: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.45);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    --glass-blur: blur(24px) saturate(140%);
+    --glass-shine: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
 
-    /* Transitions */
-    --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Cinematic Transitions */
+    --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1); /* Snappier elastic */
+    --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);   /* Luxurious smooth */
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-    /* Fonts */
+    /* Typography */
     --font-heading: 'Quicksand', sans-serif;
     --font-body: 'Open Sans', sans-serif;
 }
@@ -64,9 +69,15 @@ body::before {
     height: 100%;
     pointer-events: none;
     z-index: 9998;
-    opacity: 0.05; /* Slightly increased visibility */
-    mix-blend-mode: overlay; /* Better blending */
+    opacity: 0.04;
+    mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    animation: noiseShift 8s infinite alternate;
+}
+
+@keyframes noiseShift {
+    0% { transform: translate(0,0); }
+    100% { transform: translate(-20px, -20px); }
 }
 
 #app {
@@ -179,6 +190,12 @@ body::before {
     width: 100%;
     height: 100%;
     z-index: 1;
+    background: var(--bg-color); /* Fallback */
+}
+
+/* Harmonize Map Tiles with Theme */
+#map .leaflet-tile-pane {
+    filter: sepia(0.15) hue-rotate(5deg) saturate(0.8) contrast(1.05);
 }
 
 /* Sidebar */
@@ -188,12 +205,13 @@ body::before {
     left: 24px;
     width: 380px;
     height: calc(100% - 48px);
-    background: var(--glass-bg);
+    background-color: var(--glass-bg);
+    background-image: var(--glass-shine);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
     border-radius: 32px;
-    box-shadow: var(--glass-shadow);
+    box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.6);
     z-index: 1000;
     transform: translateX(-130%);
     transition: transform 0.8s var(--ease-bounce);
@@ -214,7 +232,7 @@ body::before {
 .sidebar-header h2 {
     margin: 0;
     font-family: var(--font-heading);
-    color: var(--text-color);
+    color: var(--text-dark);
     font-weight: 700;
     font-size: 32px;
     letter-spacing: -0.5px;
@@ -333,14 +351,15 @@ body::before {
     top: 24px;
     left: 24px;
     z-index: 1001;
-    background: var(--glass-bg);
+    background-color: var(--glass-bg);
+    background-image: var(--glass-shine);
     backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
     border-radius: 50%;
     width: 64px;
     height: 64px;
     cursor: none; /* Custom cursor */
-    box-shadow: var(--glass-shadow);
+    box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.6);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -367,7 +386,7 @@ body::before {
      transform: rotate(180deg);
 }
 
-/* Custom Cursor */
+/* Custom Cursor - Smart Blend */
 .cursor-dot,
 .cursor-outline {
     position: fixed;
@@ -382,40 +401,78 @@ body::before {
 .cursor-dot {
     width: 8px;
     height: 8px;
-    background-color: var(--text-color);
+    background-color: var(--white);
+    mix-blend-mode: exclusion;
 }
 
 .cursor-outline {
     width: 40px;
     height: 40px;
-    border: 1px solid var(--text-color);
-    transition: width 0.2s, height 0.2s, background-color 0.2s, border-color 0.2s, transform 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.1);
+    mix-blend-mode: exclusion;
+    transition: width 0.3s var(--ease-elastic), height 0.3s var(--ease-elastic), background-color 0.3s, transform 0.1s;
 }
 
 .cursor-outline.cursor-hover {
-    transform: translate(-50%, -50%) scale(1.8) !important; /* Override inline translate if needed */
-    background-color: rgba(146, 199, 176, 0.15);
-    border-color: rgba(146, 199, 176, 0.5);
+    width: 60px;
+    height: 60px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: transparent;
+    mix-blend-mode: difference;
 }
 
 .cursor-dot.cursor-hover {
-    transform: translate(-50%, -50%) scale(0.5) !important;
+    transform: translate(-50%, -50%) scale(0); /* Hide dot on hover */
 }
 
-/* Custom Marker - Beacons */
+/* Click Ripple Effect */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple-effect 0.8s linear;
+    background-color: rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+    z-index: 10;
+}
+
+@keyframes ripple-effect {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Custom Marker - Living Beacons */
 .marker-beacon {
     position: relative;
-    width: 24px;
-    height: 24px;
-    background: radial-gradient(circle at 30% 30%, var(--accent-color), var(--secondary-color));
+    width: 20px;
+    height: 20px;
+    background: var(--accent-color);
     border-radius: 50%;
     border: 2px solid var(--white);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     transition: all 0.5s var(--ease-elastic);
+    z-index: 200; /* Above map features */
 }
 
-.marker-beacon::before,
+/* Inner Pulse Core */
 .marker-beacon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    background: var(--white);
+    border-radius: 50%;
+    opacity: 0.8;
+}
+
+/* Outer Ripple */
+.marker-beacon::before {
     content: '';
     position: absolute;
     left: 50%;
@@ -424,37 +481,41 @@ body::before {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    border: 2px solid var(--accent-color);
-    animation: ripple 2.5s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    opacity: 0;
+    background: var(--accent-color);
+    animation: beaconPulse 2s infinite ease-out;
+    opacity: 0.6;
+    z-index: -1;
 }
 
-.marker-beacon::after {
-    animation-delay: 1.25s;
-}
-
-@keyframes ripple {
-    0% { width: 100%; height: 100%; opacity: 0.8; border-width: 2px; }
-    100% { width: 350%; height: 350%; opacity: 0; border-width: 0px; }
+@keyframes beaconPulse {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
 }
 
 .marker-beacon.active,
 .marker-beacon:hover {
-    background: radial-gradient(circle at 30% 30%, var(--primary-color), var(--primary-dark));
-    transform: scale(1.4);
+    background: var(--primary-color);
+    transform: scale(1.3);
     z-index: 1000;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-    border-color: rgba(255,255,255,0.9);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    border-color: var(--white);
+}
+
+.marker-beacon.active::before,
+.marker-beacon:hover::before {
+    background: var(--primary-color);
+    animation-duration: 1.5s;
 }
 
 /* Popup Styling - Floating Glass */
 .leaflet-popup-content-wrapper {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(16px) saturate(180%);
+    background-color: var(--glass-bg);
+    background-image: var(--glass-shine);
+    backdrop-filter: var(--glass-blur);
     border-radius: 24px;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    box-shadow: var(--glass-shadow), 0 25px 50px -12px rgba(0,0,0,0.25);
     padding: 0;
-    border: 1px solid rgba(255,255,255,0.6);
+    border: 1px solid var(--glass-border);
     overflow: hidden;
 }
 
@@ -516,7 +577,8 @@ body::before {
 .map-control-btn {
     width: 56px;
     height: 56px;
-    background: var(--glass-bg);
+    background-color: var(--glass-bg);
+    background-image: var(--glass-shine);
     backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
     border-radius: 50%; /* Perfect circle */
@@ -524,7 +586,7 @@ body::before {
     align-items: center;
     justify-content: center;
     cursor: none;
-    box-shadow: 0 8px 32px 0 rgba(0,0,0,0.1);
+    box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.6);
     transition: all 0.4s var(--ease-elastic);
     color: var(--text-color);
 }
@@ -544,11 +606,12 @@ body::before {
     right: 24px;
     width: 400px;
     height: calc(100% - 48px);
-    background: var(--glass-bg);
+    background-color: var(--glass-bg);
+    background-image: var(--glass-shine);
     backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
     border-radius: 32px;
-    box-shadow: -10px 0 40px rgba(0,0,0,0.1), var(--glass-shadow);
+    box-shadow: -10px 0 40px rgba(0,0,0,0.1), var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.6);
     z-index: 1002;
     transform: translateX(120%);
     transition: transform 0.8s var(--ease-bounce);
@@ -592,12 +655,12 @@ body::before {
 
 #detail-title {
     font-family: var(--font-heading);
-    color: var(--text-color);
-    font-size: 32px;
+    color: var(--text-dark);
+    font-size: 36px;
     margin-top: 0;
     margin-bottom: 16px;
     line-height: 1.1;
-    background: linear-gradient(135deg, var(--text-color) 0%, var(--primary-dark) 100%);
+    background: linear-gradient(135deg, var(--text-dark) 0%, var(--primary-dark) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -696,4 +759,35 @@ body::before {
     #detail-panel.active {
         transform: translateY(0);
     }
+
+    /* Mobile Performance & Touch Targets */
+    #attraction-list li {
+        padding: 18px 20px;
+        margin-bottom: 12px;
+    }
+
+    /* Reduce blur load on mobile */
+    #sidebar, #detail-panel, .map-control-btn, #sidebar-toggle {
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+}
+
+/* Utility: Ripple Containment */
+.map-control-btn,
+#sidebar-toggle,
+.close-btn {
+    overflow: hidden;
+    position: relative;
+    /* Ensure ripple is above background but below text if needed,
+       but for these buttons text/icon is usually z-indexed or just works.
+       Ripple has z-index 10. Buttons usually have content.
+       Let's ensure content is above ripple if needed. */
+}
+
+.map-control-btn svg,
+#sidebar-toggle svg,
+.close-btn svg {
+    position: relative;
+    z-index: 20; /* Above ripple */
 }

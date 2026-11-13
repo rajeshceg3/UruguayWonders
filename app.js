@@ -183,10 +183,12 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomControl: false
     }).setView([-32.5228, -55.7658], 7);
 
-    // Using a light, clean map style to match the pastel theme
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
+    // Warm-paper basemap (worlds shared module): OpenFreeMap vector tiles
+    // via the MapLibre GL Leaflet bridge. Free public instance, no API key.
+    maplibregl.setWorkerUrl('/vendor/maplibre/maplibre-gl-csp-worker.js');
+    L.maplibreGL({
+        style: window.WARM_MAP_STYLE,
+        attribution: '<a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener noreferrer">OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>',
         maxZoom: 19
     }).addTo(map);
 
